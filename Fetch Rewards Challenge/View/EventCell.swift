@@ -8,11 +8,17 @@
 import UIKit
 import SDWebImage
 
+protocol EventCellDelegate: class {
+    func didFavoriteEvent(eventID: Int)
+}
+
 class EventCell: UITableViewCell {
     
     // MARK: - Properties
     
     static let identifier = "EventCell"
+    
+    weak var delegate: EventCellDelegate?
     
     var viewModel: EventViewModel? {
         didSet { configure() }
@@ -50,6 +56,13 @@ class EventCell: UITableViewCell {
         return label
     }()
     
+    private lazy var favoriteButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setDimensions(height: 30, width: 30)
+        button.addTarget(self, action: #selector(handleFavoriteButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     // MARK: - Lifecycle
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -64,10 +77,20 @@ class EventCell: UITableViewCell {
         
         addSubview(stack)
         stack.anchor(top: topAnchor, left: eventImage.rightAnchor, right: rightAnchor, paddingTop: 16, paddingLeft: 32, paddingRight: 20)
+        
+        contentView.addSubview(favoriteButton)
+        favoriteButton.anchor(left: leftAnchor, bottom: bottomAnchor, paddingLeft: 16, paddingBottom: 16)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func handleFavoriteButtonTapped() {
+        guard let viewModel = viewModel else { return }
+        delegate?.didFavoriteEvent(eventID: viewModel.id)
     }
     
     // MARK: - Helpers
@@ -78,5 +101,13 @@ class EventCell: UITableViewCell {
         titleLabel.text = viewModel.title
         locationLabel.text = viewModel.location
         dateLabel.text = viewModel.date
+        
+        if viewModel.favorited {
+            let image = UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal).withTintColor(.red)
+            favoriteButton.setImage(image, for: .normal)
+        } else {
+            let image = UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
+            favoriteButton.setImage(image, for: .normal)
+        }
     }
 }

@@ -6,20 +6,26 @@
 //
 
 import UIKit
+import RealmSwift
 
 class EventSearchController: UITableViewController {
     
     // MARK: - Properties
     
+    let realm = try! Realm()
+    
     private var events = [Event]()
     private let searchController = UISearchController(searchResultsController: nil)
+    private var favoritedEventIds = Set<Int>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         configureUI()
         configureSearchController()
+        retrieveFavoritedEvents()
         fetchEvents()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -68,6 +74,16 @@ class EventSearchController: UITableViewController {
             textField.backgroundColor = .systemBlue
         }
     }
+    
+    private func retrieveFavoritedEvents() {
+        let favoritedEvents = realm.objects(FavoritedEvent.self)
+        
+        for event in favoritedEvents {
+            favoritedEventIds.insert(event.eventId)
+        }
+        
+        print(favoritedEventIds)
+    }
 
 }
 
@@ -79,9 +95,14 @@ extension EventSearchController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let event = events[indexPath.row]
+        var event = events[indexPath.row]
+        if favoritedEventIds.contains(event.id) {
+            event.favorited = true
+        }
         let cell = tableView.dequeueReusableCell(withIdentifier: EventCell.identifier, for: indexPath) as! EventCell
         cell.viewModel = EventViewModel(event: event)
+ 
+        cell.delegate = self
         return cell
     }
 }
@@ -95,7 +116,7 @@ extension EventSearchController {
         controller.viewModel = EventViewModel(event: event)
         navigationController?.pushViewController(controller, animated: true)
     }
-    
+
 
 }
 
@@ -105,5 +126,20 @@ extension EventSearchController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text else { return }
         print(searchText)
+    }
+}
+
+extension EventSearchController: EventCellDelegate {
+    func didFavoriteEvent(eventID: Int) {
+        let event = FavoritedEvent()
+        event.eventId = eventID
+        do {
+            try realm.write {
+                realm.add(event)
+                print("added")
+            }
+        } catch {
+            print("Error saving eventID \(error)")
+        }
     }
 }

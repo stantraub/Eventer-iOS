@@ -6,12 +6,18 @@
 //
 
 import Foundation
+import RealmSwift
 
 struct EventViewModel {
     
     // MARK: - Properties
     
     private let event: Event
+    private let realm = try! Realm()
+    
+    var id: Int {
+        return event.id
+    }
     
     var title: String {
         return event.title
@@ -37,9 +43,15 @@ struct EventViewModel {
         return URL(string: image)
     }
     
+    var favorited: Bool {
+        return event.favorited
+    }
+    
+    
     // MARK: - Lifecycle
     
     init(event: Event) {
         self.event = event
+
     }
 }

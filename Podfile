@@ -11,6 +11,6 @@ target 'Fetch Rewards Challenge' do
   pod 'JGProgressHUD'
   pod 'SDWebImage'
   pod 'SwiftyJSON'
-  pod 'Realm' 
+  pod 'RealmSwift' 
 
 end

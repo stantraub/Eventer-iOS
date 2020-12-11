@@ -13,6 +13,7 @@ struct Event: Codable {
     let datetimeUtc: String
     let venue: Venue
     let performers: [Performer]
+    var favorited: Bool = false
     
     enum CodingKeys: String, CodingKey {
         case id = "id"
