@@ -14,7 +14,7 @@ class EventCell: UITableViewCell {
     
     static let identifier = "EventCell"
     
-    var viewModel: EventCellViewModel? {
+    var viewModel: EventViewModel? {
         didSet { configure() }
     }
     
@@ -46,7 +46,7 @@ class EventCell: UITableViewCell {
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
-        label.textColor = .label
+        label.textColor = .secondaryLabel
         return label
     }()
     

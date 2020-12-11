@@ -117,12 +117,12 @@ extension UIViewController {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .systemBlue
         
+        navigationController?.navigationBar.isHidden = false
         navigationController?.navigationBar.overrideUserInterfaceStyle = .dark
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.tintColor = .white
         navigationController?.navigationBar.isTranslucent = true
-        
     }
 }

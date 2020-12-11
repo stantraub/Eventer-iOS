@@ -18,7 +18,7 @@
 		11AE63A02581DF1B00CEF934 /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AE639F2581DF1B00CEF934 /* Service.swift */; };
 		11AE63A32581DF3800CEF934 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AE63A22581DF3800CEF934 /* Event.swift */; };
 		11AE63A62581F6D800CEF934 /* EventCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AE63A52581F6D800CEF934 /* EventCell.swift */; };
-		11AE63AA2581F70E00CEF934 /* EventCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AE63A92581F70E00CEF934 /* EventCellViewModel.swift */; };
+		11AE63AA2581F70E00CEF934 /* EventViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AE63A92581F70E00CEF934 /* EventViewModel.swift */; };
 		11AE63B32582C3E500CEF934 /* EventDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AE63B22582C3E500CEF934 /* EventDetailController.swift */; };
 /* End PBXBuildFile section */
 
@@ -35,7 +35,7 @@
 		11AE639F2581DF1B00CEF934 /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
 		11AE63A22581DF3800CEF934 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		11AE63A52581F6D800CEF934 /* EventCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCell.swift; sourceTree = "<group>"; };
-		11AE63A92581F70E00CEF934 /* EventCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCellViewModel.swift; sourceTree = "<group>"; };
+		11AE63A92581F70E00CEF934 /* EventViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventViewModel.swift; sourceTree = "<group>"; };
 		11AE63B22582C3E500CEF934 /* EventDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailController.swift; sourceTree = "<group>"; };
 		13C40B74808715F27E2D9132 /* Pods-Fetch Rewards Challenge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fetch Rewards Challenge.debug.xcconfig"; path = "Target Support Files/Pods-Fetch Rewards Challenge/Pods-Fetch Rewards Challenge.debug.xcconfig"; sourceTree = "<group>"; };
 		37B9084D503CE3A552756B92 /* Pods-Fetch Rewards Challenge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fetch Rewards Challenge.release.xcconfig"; path = "Target Support Files/Pods-Fetch Rewards Challenge/Pods-Fetch Rewards Challenge.release.xcconfig"; sourceTree = "<group>"; };
@@ -110,7 +110,7 @@
 		11AE63902581DD1C00CEF934 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				11AE63A92581F70E00CEF934 /* EventCellViewModel.swift */,
+				11AE63A92581F70E00CEF934 /* EventViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -272,7 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				11AE637E2581DA7400CEF934 /* EventSearchController.swift in Sources */,
-				11AE63AA2581F70E00CEF934 /* EventCellViewModel.swift in Sources */,
+				11AE63AA2581F70E00CEF934 /* EventViewModel.swift in Sources */,
 				11AE637A2581DA7400CEF934 /* AppDelegate.swift in Sources */,
 				11AE63A62581F6D800CEF934 /* EventCell.swift in Sources */,
 				11AE63A02581DF1B00CEF934 /* Service.swift in Sources */,
@@ -430,6 +430,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = N8Z6DLFKLR;
 				INFOPLIST_FILE = "Fetch Rewards Challenge/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -450,6 +451,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = N8Z6DLFKLR;
 				INFOPLIST_FILE = "Fetch Rewards Challenge/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

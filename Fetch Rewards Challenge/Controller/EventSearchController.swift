@@ -17,14 +17,14 @@ class EventSearchController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        configureUI()
+        configureSearchController()
+        fetchEvents()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
-        configureUI()
-        configureSearchController()
-        fetchEvents()
     }
     
     // MARK: - API
@@ -81,7 +81,7 @@ extension EventSearchController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let event = events[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: EventCell.identifier, for: indexPath) as! EventCell
-        cell.viewModel = EventCellViewModel(event: event)
+        cell.viewModel = EventViewModel(event: event)
         return cell
     }
 }
@@ -92,7 +92,7 @@ extension EventSearchController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let event = events[indexPath.row]
         let controller = EventDetailController()
-        controller.event = event
+        controller.viewModel = EventViewModel(event: event)
         navigationController?.pushViewController(controller, animated: true)
     }
     
