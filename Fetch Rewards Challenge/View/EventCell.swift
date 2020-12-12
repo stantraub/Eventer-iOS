@@ -79,7 +79,7 @@ class EventCell: UITableViewCell {
         stack.anchor(top: topAnchor, left: eventImage.rightAnchor, right: rightAnchor, paddingTop: 16, paddingLeft: 32, paddingRight: 20)
         
         contentView.addSubview(favoriteButton)
-        favoriteButton.anchor(left: leftAnchor, bottom: bottomAnchor, paddingLeft: 16, paddingBottom: 16)
+        favoriteButton.anchor(left: leftAnchor, bottom: bottomAnchor, paddingLeft: 20, paddingBottom: 16)
     }
     
     required init?(coder: NSCoder) {

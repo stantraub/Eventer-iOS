@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		05DE026D4F85D8FAF3DCE90B /* Pods_Fetch_Rewards_Challenge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E8F71A9E7B1B72B2F93C1C /* Pods_Fetch_Rewards_Challenge.framework */; };
+		117CD599258490AF0066CDC5 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117CD598258490AF0066CDC5 /* DatabaseManager.swift */; };
 		1182C0C32583456500D2C730 /* FavoritedEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1182C0C22583456500D2C730 /* FavoritedEvent.swift */; };
 		11AE637A2581DA7400CEF934 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AE63792581DA7400CEF934 /* AppDelegate.swift */; };
 		11AE637C2581DA7400CEF934 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11AE637B2581DA7400CEF934 /* SceneDelegate.swift */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		117CD598258490AF0066CDC5 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		1182C0C22583456500D2C730 /* FavoritedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritedEvent.swift; sourceTree = "<group>"; };
 		11AE63762581DA7400CEF934 /* Fetch Rewards Challenge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Fetch Rewards Challenge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		11AE63792581DA7400CEF934 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 			children = (
 				11AE63A22581DF3800CEF934 /* Event.swift */,
 				1182C0C22583456500D2C730 /* FavoritedEvent.swift */,
+				117CD598258490AF0066CDC5 /* DatabaseManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				11AE637E2581DA7400CEF934 /* EventSearchController.swift in Sources */,
+				117CD599258490AF0066CDC5 /* DatabaseManager.swift in Sources */,
 				11AE63AA2581F70E00CEF934 /* EventViewModel.swift in Sources */,
 				11AE637A2581DA7400CEF934 /* AppDelegate.swift in Sources */,
 				11AE63A62581F6D800CEF934 /* EventCell.swift in Sources */,
