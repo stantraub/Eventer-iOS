@@ -47,17 +47,33 @@ class EventViewModel {
     
     var favoriteButtonImageEventCell: UIImage? {
         if isFavorited {
-            return UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal).withTintColor(.red)
+            if #available(iOS 13.0, *) {
+                return UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal).withTintColor(.red)
+            } else {
+                return UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal)
+            }
         } else {
-            return UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.label)
+            if #available(iOS 13.0, *) {
+                return UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.label)
+            } else {
+                return UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal)
+            }
         }
     }
     
     var favoriteButtonImageDetailController: UIImage? {
         if isFavorited {
-            return UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal).withTintColor(.red)
+            if #available(iOS 13.0, *) {
+                return UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal).withTintColor(.red)
+            } else {
+                return UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal)
+            }
         } else {
-            return UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
+            if #available(iOS 13.0, *) {
+                return UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
+            } else {
+                return UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal)
+            }
         }
     }
     

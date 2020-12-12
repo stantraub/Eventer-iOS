@@ -112,17 +112,11 @@ extension UIViewController {
         }
     }
     
-    func configureNavigationBar() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .systemBlue
-        
+    func configureNavigationBar(withTitle title: String) {
         navigationController?.navigationBar.isHidden = false
-        navigationController?.navigationBar.overrideUserInterfaceStyle = .dark
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.tintColor = .white
         navigationController?.navigationBar.isTranslucent = true
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = title
     }
 }

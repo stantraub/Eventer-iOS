@@ -25,8 +25,14 @@ class EventDetailController: UIViewController {
     
     private lazy var backButton: UIButton = {
         let button = UIButton(type: .system)
-        let image = UIImage(named: "chevron.left")?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
-        button.setImage(image, for: .normal)
+        if #available(iOS 13.0, *) {
+            let image = UIImage(named: "chevron.left")?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
+            button.setImage(image, for: .normal)
+        } else {
+            let image = UIImage(named: "chevron.left")?.withRenderingMode(.alwaysOriginal)
+            button.setImage(image, for: .normal)
+        }
+        
         button.setDimensions(height: 30, width: 30)
         button.addTarget(self, action: #selector(handleBackButtonTapped), for: .touchUpInside)
         return button
@@ -43,21 +49,33 @@ class EventDetailController: UIViewController {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 24)
         label.numberOfLines = 0
-        label.textColor = .label
+        if #available(iOS 13.0, *) {
+            label.textColor = .label
+        } else {
+            label.textColor = .black
+        }
         return label
     }()
     
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 18)
-        label.textColor = .secondaryLabel
+        if #available(iOS 13.0, *) {
+            label.textColor = .secondaryLabel
+        } else {
+            label.textColor = .darkGray
+        }
         return label
     }()
     
     private let locationLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
-        label.textColor = .secondaryLabel
+        if #available(iOS 13.0, *) {
+            label.textColor = .secondaryLabel
+        } else {
+            label.textColor = .darkGray
+        }
         return label
     }()
     
@@ -87,7 +105,11 @@ class EventDetailController: UIViewController {
     // MARK: - Helpers
     
     private func configureUI() {
-        view.backgroundColor = .systemBackground
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemBackground
+        } else {
+            view.backgroundColor = .white
+        }
         
         view.addSubview(eventImageView)
         eventImageView.anchor(top: view.topAnchor)

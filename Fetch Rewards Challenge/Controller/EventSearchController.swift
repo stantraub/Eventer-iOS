@@ -17,17 +17,15 @@ class EventSearchController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
         configureUI()
         configureSearchController()
         fetchAndPopulateFavoritedEvents()
         fetchEvents()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        configureNavigationBar()
+        configureNavigationBar(withTitle: "Events")
         favoritedEventIds.removeAll()
         fetchAndPopulateFavoritedEvents()
     }
@@ -58,6 +56,12 @@ class EventSearchController: UITableViewController {
     // MARK: - Helpers
     
     private func configureUI() {
+        if #available(iOS 13.0, *) {
+            tableView.backgroundColor = .systemBackground
+        } else {
+            tableView.backgroundColor = .white
+        }
+        
         tableView.register(EventCell.self, forCellReuseIdentifier: EventCell.identifier)
         tableView.rowHeight = 180
     }
@@ -65,12 +69,12 @@ class EventSearchController: UITableViewController {
     private func configureSearchController() {
         searchController.searchResultsUpdater = self
         navigationItem.searchController = searchController
+
         searchController.searchBar.placeholder = "Search events"
         definesPresentationContext = false
         
         if let textField = searchController.searchBar.value(forKey: "searchField") as? UITextField {
             textField.textColor = .white
-            textField.backgroundColor = .systemBlue
         }
     }
     
@@ -84,7 +88,6 @@ class EventSearchController: UITableViewController {
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
-        
     }
 }
 

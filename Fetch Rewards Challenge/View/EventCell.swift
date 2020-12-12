@@ -30,14 +30,22 @@ class EventCell: UITableViewCell {
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 22
-        iv.layer.cornerCurve = .continuous
+        if #available(iOS 13.0, *) {
+            iv.layer.cornerCurve = .continuous
+        } else {
+            // Fallback on earlier versions
+        }
         return iv
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 18)
-        label.textColor = .label
+        if #available(iOS 13.0, *) {
+            label.textColor = .label
+        } else {
+            label.textColor = .black
+        }
         label.numberOfLines = 0
         return label
     }()
@@ -45,14 +53,22 @@ class EventCell: UITableViewCell {
     private let locationLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
-        label.textColor = .secondaryLabel
+        if #available(iOS 13.0, *) {
+            label.textColor = .secondaryLabel
+        } else {
+            label.textColor = .darkGray
+        }
         return label
     }()
     
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
-        label.textColor = .secondaryLabel
+        if #available(iOS 13.0, *) {
+            label.textColor = .secondaryLabel
+        } else {
+            label.textColor = .darkGray
+        }
         return label
     }()
     
