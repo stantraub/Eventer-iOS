@@ -61,11 +61,9 @@ class EventViewModel {
         }
     }
     
-    
     // MARK: - Lifecycle
     
     init(event: Event) {
         self.event = event
-
     }
 }

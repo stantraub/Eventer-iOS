@@ -6,14 +6,11 @@
 //
 
 import UIKit
-import RealmSwift
 
 class EventSearchController: UITableViewController {
     
     // MARK: - Properties
-    
-    let realm = try! Realm()
-    
+        
     private var events = [Event]()
     private let searchController = UISearchController(searchResultsController: nil)
     private var favoritedEventIds = Set<Int>()
@@ -33,8 +30,6 @@ class EventSearchController: UITableViewController {
         configureNavigationBar()
         favoritedEventIds.removeAll()
         fetchAndPopulateFavoritedEvents()
-
-        print(favoritedEventIds)
     }
     
     // MARK: - API
@@ -80,7 +75,7 @@ class EventSearchController: UITableViewController {
     }
     
     private func fetchAndPopulateFavoritedEvents() {
-        let favoritedEvents = realm.objects(FavoritedEvent.self)
+        let favoritedEvents = DatabaseManager.shared.fetchFavoriteEvents()
         
         for event in favoritedEvents {
             favoritedEventIds.insert(event.eventId)
@@ -91,40 +86,6 @@ class EventSearchController: UITableViewController {
         }
         
     }
-    
-    private func addFavoriteEvent(eventID: Int) {
-        let event = FavoritedEvent()
-        event.eventId = eventID
-        
-        do {
-            try realm.write { [weak self] in
-                realm.add(event)
-                favoritedEventIds.insert(eventID)
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
-            }
-        } catch {
-            print("Error saving event \(error)")
-        }
-    }
-    
-    private func unfavoriteEvent(eventID: Int) {
-        let event = realm.objects(FavoritedEvent.self).filter("eventId == \(eventID)")
-        
-        do {
-            try realm.write { [weak self] in
-                realm.delete(event)
-                favoritedEventIds.remove(eventID)
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
-            }
-        } catch {
-            print("Error deleting event \(error)")
-        }
-    }
-
 }
 
 // MARK: - UITableViewDataSource
@@ -172,9 +133,29 @@ extension EventSearchController: UISearchResultsUpdating {
 extension EventSearchController: EventFavoritedProtocol {
     func didFavoriteEvent(eventID: Int) {
         if favoritedEventIds.contains(eventID) {
-            unfavoriteEvent(eventID: eventID)
+            DatabaseManager.shared.unfavoriteEvent(eventID: eventID) { [weak self] result in
+                switch result {
+                case .success(_):
+                    self?.favoritedEventIds.remove(eventID)
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                case .failure(let error):
+                    print(error)
+                }
+            }
         } else {
-            addFavoriteEvent(eventID: eventID)
+            DatabaseManager.shared.favoriteEvent(eventID: eventID) { [weak self] result in
+                switch result {
+                case .success(_):
+                    self?.favoritedEventIds.insert(eventID)
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                case .failure(let error):
+                    print(error)
+                }
+            }
         }
     }
 }

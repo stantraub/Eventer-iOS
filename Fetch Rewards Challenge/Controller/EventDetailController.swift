@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import RealmSwift
 
 class EventDetailController: UIViewController {
     
@@ -15,8 +14,6 @@ class EventDetailController: UIViewController {
     var viewModel: EventViewModel? {
         didSet { configureWithViewModel() }
     }
-    
-    let realm = try! Realm()
     
     private let gradientLayer = CAGradientLayer()
     
@@ -69,7 +66,6 @@ class EventDetailController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -130,40 +126,6 @@ class EventDetailController: UIViewController {
         view.layer.addSublayer(gradientLayer)
     }
     
-    private func addFavoriteEvent(eventID: Int) {
-        guard let viewModel = viewModel else { return }
-        let event = FavoritedEvent()
-        event.eventId = eventID
-        
-        do {
-            try realm.write {
-                realm.add(event)
-                viewModel.event.favorited.toggle()
-                DispatchQueue.main.async {
-                    self.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
-                }
-            }
-        } catch {
-            print("Error saving event \(error)")
-        }
-    }
-    
-    private func unfavoriteEvent(eventID: Int) {
-        guard let viewModel = viewModel else { return }
-        let event = realm.objects(FavoritedEvent.self).filter("eventId == \(eventID)")
-        
-        do {
-            try realm.write {
-                realm.delete(event)
-                viewModel.event.favorited.toggle()
-                DispatchQueue.main.async {
-                    self.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
-                }
-            }
-        } catch {
-            print("Error deleting event \(error)")
-        }
-    }
 }
 
 // MARK: - EventFavoritedProtocol
@@ -172,10 +134,16 @@ extension EventDetailController: EventFavoritedProtocol {
     func didFavoriteEvent(eventID: Int) {
         guard let viewModel = viewModel else { return }
         
-        if viewModel.event.favorited {
-            unfavoriteEvent(eventID: eventID)
-        } else {
-            addFavoriteEvent(eventID: eventID)
+        DatabaseManager.shared.favoriteEvent(eventID: eventID) { [weak self] result in
+            switch result {
+            case .success(_):
+                viewModel.event.favorited.toggle()
+                DispatchQueue.main.async {
+                    self?.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
+                }
+            case .failure(let error):
+                print(error)
+            }
         }
 
     }
