@@ -8,7 +8,7 @@
 import UIKit
 import SDWebImage
 
-protocol EventCellDelegate: class {
+protocol EventFavoritedProtocol: class {
     func didFavoriteEvent(eventID: Int)
 }
 
@@ -18,7 +18,7 @@ class EventCell: UITableViewCell {
     
     static let identifier = "EventCell"
     
-    weak var delegate: EventCellDelegate?
+    weak var delegate: EventFavoritedProtocol?
     
     var viewModel: EventViewModel? {
         didSet { configure() }
@@ -101,13 +101,6 @@ class EventCell: UITableViewCell {
         titleLabel.text = viewModel.title
         locationLabel.text = viewModel.location
         dateLabel.text = viewModel.date
-        
-        if viewModel.favorited {
-            let image = UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal).withTintColor(.red)
-            favoriteButton.setImage(image, for: .normal)
-        } else {
-            let image = UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
-            favoriteButton.setImage(image, for: .normal)
-        }
+        favoriteButton.setImage(viewModel.favoriteButtonImageEventCell, for: .normal)
     }
 }

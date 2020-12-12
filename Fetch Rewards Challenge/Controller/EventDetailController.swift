@@ -6,14 +6,17 @@
 //
 
 import UIKit
+import RealmSwift
 
 class EventDetailController: UIViewController {
     
     // MARK: - Properties
-    
+        
     var viewModel: EventViewModel? {
-        didSet { configure() }
+        didSet { configureWithViewModel() }
     }
+    
+    let realm = try! Realm()
     
     private let gradientLayer = CAGradientLayer()
     
@@ -34,8 +37,6 @@ class EventDetailController: UIViewController {
     
     private lazy var favoriteButton: UIButton = {
         let button = UIButton(type: .system)
-        let image = UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
-        button.setImage(image, for: .normal)
         button.setDimensions(height: 30, width: 30)
         button.addTarget(self, action: #selector(handleFavoriteButtonTapped), for: .touchUpInside)
         return button
@@ -83,7 +84,8 @@ class EventDetailController: UIViewController {
     }
     
     @objc private func handleFavoriteButtonTapped() {
-        print("DEBUG: Favorite tapped")
+        guard let viewModel = viewModel else { return }
+        didFavoriteEvent(eventID: viewModel.id)
     }
     
     // MARK: - Helpers
@@ -112,12 +114,13 @@ class EventDetailController: UIViewController {
         
     }
     
-    private func configure() {
+    private func configureWithViewModel() {
         guard let viewModel = viewModel else { return }
         eventImageView.sd_setImage(with: viewModel.image)
         eventTitleLabel.text = viewModel.title
         dateLabel.text = viewModel.date
         locationLabel.text = viewModel.location
+        favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
     }
     
     private func configureGradientLayer() {
@@ -125,5 +128,55 @@ class EventDetailController: UIViewController {
         gradientLayer.locations = [-0.03, 0.05]
         gradientLayer.frame = view.frame
         view.layer.addSublayer(gradientLayer)
+    }
+    
+    private func addFavoriteEvent(eventID: Int) {
+        guard let viewModel = viewModel else { return }
+        let event = FavoritedEvent()
+        event.eventId = eventID
+        
+        do {
+            try realm.write {
+                realm.add(event)
+                viewModel.event.favorited.toggle()
+                DispatchQueue.main.async {
+                    self.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
+                }
+            }
+        } catch {
+            print("Error saving event \(error)")
+        }
+    }
+    
+    private func unfavoriteEvent(eventID: Int) {
+        guard let viewModel = viewModel else { return }
+        let event = realm.objects(FavoritedEvent.self).filter("eventId == \(eventID)")
+        
+        do {
+            try realm.write {
+                realm.delete(event)
+                viewModel.event.favorited.toggle()
+                DispatchQueue.main.async {
+                    self.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
+                }
+            }
+        } catch {
+            print("Error deleting event \(error)")
+        }
+    }
+}
+
+// MARK: - EventFavoritedProtocol
+
+extension EventDetailController: EventFavoritedProtocol {
+    func didFavoriteEvent(eventID: Int) {
+        guard let viewModel = viewModel else { return }
+        
+        if viewModel.event.favorited {
+            unfavoriteEvent(eventID: eventID)
+        } else {
+            addFavoriteEvent(eventID: eventID)
+        }
+
     }
 }

@@ -23,7 +23,7 @@ class EventSearchController: UITableViewController {
         view.backgroundColor = .systemBackground
         configureUI()
         configureSearchController()
-        retrieveFavoritedEvents()
+        fetchAndPopulateFavoritedEvents()
         fetchEvents()
         
     }
@@ -31,6 +31,10 @@ class EventSearchController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigationBar()
+        favoritedEventIds.removeAll()
+        fetchAndPopulateFavoritedEvents()
+
+        print(favoritedEventIds)
     }
     
     // MARK: - API
@@ -48,14 +52,14 @@ class EventSearchController: UITableViewController {
                     self?.tableView.reloadData()
                 }
             case .failure(let error):
-                self?.showLoader(false)
+                DispatchQueue.main.async {
+                    self?.showLoader(false)
+                }
                 print(error)
             }
         }
     }
-    
-    // MARK: - Actions
-    
+        
     // MARK: - Helpers
     
     private func configureUI() {
@@ -75,14 +79,50 @@ class EventSearchController: UITableViewController {
         }
     }
     
-    private func retrieveFavoritedEvents() {
+    private func fetchAndPopulateFavoritedEvents() {
         let favoritedEvents = realm.objects(FavoritedEvent.self)
         
         for event in favoritedEvents {
             favoritedEventIds.insert(event.eventId)
         }
         
-        print(favoritedEventIds)
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+        
+    }
+    
+    private func addFavoriteEvent(eventID: Int) {
+        let event = FavoritedEvent()
+        event.eventId = eventID
+        
+        do {
+            try realm.write { [weak self] in
+                realm.add(event)
+                favoritedEventIds.insert(eventID)
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+            }
+        } catch {
+            print("Error saving event \(error)")
+        }
+    }
+    
+    private func unfavoriteEvent(eventID: Int) {
+        let event = realm.objects(FavoritedEvent.self).filter("eventId == \(eventID)")
+        
+        do {
+            try realm.write { [weak self] in
+                realm.delete(event)
+                favoritedEventIds.remove(eventID)
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+            }
+        } catch {
+            print("Error deleting event \(error)")
+        }
     }
 
 }
@@ -101,7 +141,6 @@ extension EventSearchController {
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: EventCell.identifier, for: indexPath) as! EventCell
         cell.viewModel = EventViewModel(event: event)
- 
         cell.delegate = self
         return cell
     }
@@ -111,13 +150,14 @@ extension EventSearchController {
 
 extension EventSearchController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let event = events[indexPath.row]
+        var event = events[indexPath.row]
+        if favoritedEventIds.contains(event.id) {
+            event.favorited = true
+        }
         let controller = EventDetailController()
         controller.viewModel = EventViewModel(event: event)
         navigationController?.pushViewController(controller, animated: true)
     }
-
-
 }
 
 // MARK: - UISearchResultsUpdating
@@ -129,17 +169,12 @@ extension EventSearchController: UISearchResultsUpdating {
     }
 }
 
-extension EventSearchController: EventCellDelegate {
+extension EventSearchController: EventFavoritedProtocol {
     func didFavoriteEvent(eventID: Int) {
-        let event = FavoritedEvent()
-        event.eventId = eventID
-        do {
-            try realm.write {
-                realm.add(event)
-                print("added")
-            }
-        } catch {
-            print("Error saving eventID \(error)")
+        if favoritedEventIds.contains(eventID) {
+            unfavoriteEvent(eventID: eventID)
+        } else {
+            addFavoriteEvent(eventID: eventID)
         }
     }
 }

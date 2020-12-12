@@ -5,15 +5,13 @@
 //  Created by Stanley Traub on 12/9/20.
 //
 
-import Foundation
-import RealmSwift
+import UIKit
 
-struct EventViewModel {
+class EventViewModel {
     
     // MARK: - Properties
     
-    private let event: Event
-    private let realm = try! Realm()
+    var event: Event
     
     var id: Int {
         return event.id
@@ -43,8 +41,24 @@ struct EventViewModel {
         return URL(string: image)
     }
     
-    var favorited: Bool {
+    var isFavorited: Bool {
         return event.favorited
+    }
+    
+    var favoriteButtonImageEventCell: UIImage? {
+        if isFavorited {
+            return UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal).withTintColor(.red)
+        } else {
+            return UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.label)
+        }
+    }
+    
+    var favoriteButtonImageDetailController: UIImage? {
+        if isFavorited {
+            return UIImage(named: "suit.heart.fill")?.withRenderingMode(.alwaysOriginal).withTintColor(.red)
+        } else {
+            return UIImage(named: "suit.heart")?.withRenderingMode(.alwaysOriginal).withTintColor(.white)
+        }
     }
     
     
