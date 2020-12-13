@@ -12,7 +12,7 @@
 
 ```bash
 $ git clone https://github.com/stantraub/FetchRewardsChallenge.git
-$ cd Fetch\ Rewards\ Challenge/
+$ cd FetchRewardsChallenge
 $ pod install
 $ open Fetch\ Rewards\ Challenge.xcworkspace/
 ```
