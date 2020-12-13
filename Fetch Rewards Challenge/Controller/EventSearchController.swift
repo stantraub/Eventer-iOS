@@ -78,6 +78,15 @@ final class EventSearchController: UITableViewController {
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.searchBar.placeholder = "Search events"
         searchController.searchBar.delegate = self
+        if #available(iOS 13.0, *) {
+            let cancelButtonAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
+            UIBarButtonItem.appearance().setTitleTextAttributes(cancelButtonAttributes, for: .normal)
+        } else {
+            // Fallback on earlier versions
+            let cancelButtonAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+            UIBarButtonItem.appearance().setTitleTextAttributes(cancelButtonAttributes, for: .normal)
+        }
+
         navigationItem.searchController = searchController
 
         definesPresentationContext = false
