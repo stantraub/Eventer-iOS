@@ -145,7 +145,7 @@ extension EventSearchController: UISearchResultsUpdating {
         guard let searchText = searchController.searchBar.text?.lowercased() else { return }
         
         filteredEvents = events.filter { $0.title.lowercased().contains(searchText) }
-        print(filteredEvents)
+
         DispatchQueue.main.async { [weak self] in
             self?.tableView.reloadData()
         }
