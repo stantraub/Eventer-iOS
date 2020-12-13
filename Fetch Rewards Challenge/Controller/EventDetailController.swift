@@ -7,7 +7,7 @@
 
 import UIKit
 
-class EventDetailController: UIViewController {
+final class EventDetailController: UIViewController {
     
     // MARK: - Properties
         

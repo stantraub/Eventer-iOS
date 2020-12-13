@@ -7,13 +7,19 @@
 
 import UIKit
 
-class EventSearchController: UITableViewController {
+final class EventSearchController: UITableViewController {
     
     // MARK: - Properties
-        
-    private var events = [Event]()
+    
     private let searchController = UISearchController(searchResultsController: nil)
+    
+    private var events = [Event]()
+    private var filteredEvents = [Event]()
     private var favoritedEventIds = Set<Int>()
+    
+    private var inSearchMode: Bool {
+        return searchController.isActive && !searchController.searchBar.text!.isEmpty
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,14 +74,13 @@ class EventSearchController: UITableViewController {
     
     private func configureSearchController() {
         searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.placeholder = "Search events"
+        searchController.searchBar.delegate = self
         navigationItem.searchController = searchController
 
-        searchController.searchBar.placeholder = "Search events"
         definesPresentationContext = false
-        
-        if let textField = searchController.searchBar.value(forKey: "searchField") as? UITextField {
-            textField.textColor = .white
-        }
     }
     
     private func fetchAndPopulateFavoritedEvents() {
@@ -95,11 +100,11 @@ class EventSearchController: UITableViewController {
 
 extension EventSearchController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return events.count
+        return inSearchMode ? filteredEvents.count : events.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var event = events[indexPath.row]
+        var event = inSearchMode ? filteredEvents[indexPath.row] : events[indexPath.row]
         if favoritedEventIds.contains(event.id) {
             event.favorited = true
         }
@@ -114,7 +119,7 @@ extension EventSearchController {
 
 extension EventSearchController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        var event = events[indexPath.row]
+        var event = inSearchMode ? filteredEvents[indexPath.row] : events[indexPath.row]
         if favoritedEventIds.contains(event.id) {
             event.favorited = true
         }
@@ -124,12 +129,26 @@ extension EventSearchController {
     }
 }
 
+// MARK: - UISearchBarDelegate
+
+extension EventSearchController: UISearchBarDelegate {
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.endEditing(true)
+        searchBar.text = nil
+    }
+}
+
 // MARK: - UISearchResultsUpdating
 
 extension EventSearchController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        guard let searchText = searchController.searchBar.text else { return }
-        print(searchText)
+        guard let searchText = searchController.searchBar.text?.lowercased() else { return }
+        
+        filteredEvents = events.filter { $0.title.lowercased().contains(searchText) }
+        print(filteredEvents)
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
+        }
     }
 }
 
