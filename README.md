@@ -31,6 +31,7 @@ $ open Fetch\ Rewards\ Challenge.xcworkspace/
 - [x] Events fetched from the SeatGeek API and displayed on the Events search page 
   - Event images are cached with SDWebImage to ensure quick image loading
 - [x] Dark mode support!
+- [x] iOS 12+ supported
 - [x] Events can be liked/unliked from both the event search and detail screens
   - Favorited events are persisted into memory with Realm
 - [x] Events can be searched by title on the event search page
