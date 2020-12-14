@@ -21,7 +21,7 @@ struct Service {
                 let events = try decoder.decode([Event].self, from: try json["events"].rawData())
                 completion(.success(events))
             } catch let jsonErr {
-                completion(.failure(jsonErr))
+                completion(.failure(DecodingError.failedToDecode(error: jsonErr)))
             }
         }
     }
