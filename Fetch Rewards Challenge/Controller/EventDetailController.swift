@@ -157,17 +157,32 @@ extension EventDetailController: EventFavoritedProtocol {
     func didFavoriteEvent(eventID: Int) {
         guard let viewModel = viewModel else { return }
         
-        DatabaseManager.shared.favoriteEvent(eventID: eventID) { [weak self] result in
-            switch result {
-            case .success(_):
-                viewModel.event.favorited.toggle()
-                DispatchQueue.main.async {
-                    self?.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
+        if viewModel.isFavorited {
+            DatabaseManager.shared.unfavoriteEvent(eventID: eventID) { [weak self] result in
+                switch result {
+                case .success(_):
+                    viewModel.event.favorited.toggle()
+                    DispatchQueue.main.async {
+                        self?.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
+                    }
+                case .failure(let error):
+                    print(error)
                 }
-            case .failure(let error):
-                print(error)
+            }
+        } else {
+            DatabaseManager.shared.favoriteEvent(eventID: eventID) { [weak self] result in
+                switch result {
+                case .success(_):
+                    viewModel.event.favorited.toggle()
+                    DispatchQueue.main.async {
+                        self?.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
+                    }
+                case .failure(let error):
+                    print(error)
+                }
             }
         }
+
 
     }
 }
