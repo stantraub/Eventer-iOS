@@ -10,7 +10,7 @@ import Alamofire
 import SwiftyJSON
 
 struct Service {
-    static func fetchEvents(completion: @escaping(Result<[Event], Error>) -> Void) {
+    static func fetchEvents(completion: @escaping(Result<[Event], DecodingError>) -> Void) {
         let endpoint = "https://api.seatgeek.com/2/events?client_id=MjE0MjczMzF8MTYwNzU4MjU1NC4zODc2NDA3"
         
         AF.request(endpoint).responseJSON { response in

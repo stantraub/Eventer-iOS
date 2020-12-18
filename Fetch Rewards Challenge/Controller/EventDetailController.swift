@@ -130,7 +130,6 @@ final class EventDetailController: UIViewController {
         
         view.addSubview(stack)
         stack.anchor(top: eventImageView.bottomAnchor, left: view.leftAnchor, right: view.rightAnchor, paddingTop: 16, paddingLeft: 20, paddingRight: 20)
-        
     }
     
     private func configureWithViewModel() {
@@ -148,7 +147,6 @@ final class EventDetailController: UIViewController {
         gradientLayer.frame = view.frame
         view.layer.addSublayer(gradientLayer)
     }
-    
 }
 
 // MARK: - EventFavoritedProtocol
@@ -182,7 +180,5 @@ extension EventDetailController: EventFavoritedProtocol {
                 }
             }
         }
-
-
     }
 }

@@ -54,7 +54,8 @@ final class EventSearchController: UITableViewController {
                 DispatchQueue.main.async {
                     self?.showLoader(false)
                 }
-                print(error)
+                
+                print(error.localizedDescription)
             }
         }
     }
