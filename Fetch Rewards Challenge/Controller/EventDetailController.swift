@@ -153,7 +153,7 @@ final class EventDetailController: UIViewController {
 
 extension EventDetailController: EventFavoritedProtocol {
     func didFavoriteEvent(eventID: Int) {
-        guard let viewModel = viewModel else { return }
+        guard var viewModel = viewModel else { return }
         
         if viewModel.isFavorited {
             DatabaseManager.shared.unfavoriteEvent(eventID: eventID) { [weak self] result in
