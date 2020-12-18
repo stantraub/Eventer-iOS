@@ -21,7 +21,7 @@ class DatabaseManager {
         return Array(realm.objects(FavoritedEvent.self))
     }
     
-    func favoriteEvent(eventID: Int, completion: @escaping(Result<Bool, Error>) -> Void){
+    func favoriteEvent(eventID: Int, completion: @escaping(Result<Bool, DatabaseError>) -> Void){
         let event = FavoritedEvent()
         event.eventId = eventID
         
@@ -36,7 +36,7 @@ class DatabaseManager {
     }
     
     
-    func unfavoriteEvent(eventID: Int, completion: @escaping(Result<Bool, Error>) -> Void) {
+    func unfavoriteEvent(eventID: Int, completion: @escaping(Result<Bool, DatabaseError>) -> Void) {
         let event = realm.objects(FavoritedEvent.self).filter("eventId == \(eventID)")
 
         do {

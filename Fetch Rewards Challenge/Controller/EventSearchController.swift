@@ -173,7 +173,7 @@ extension EventSearchController: EventFavoritedProtocol {
                         self?.tableView.reloadData()
                     }
                 case .failure(let error):
-                    print(error)
+                    print(error.localizedDescription)
                 }
             }
         } else {
@@ -185,7 +185,7 @@ extension EventSearchController: EventFavoritedProtocol {
                         self?.tableView.reloadData()
                     }
                 case .failure(let error):
-                    print(error)
+                    print(error.localizedDescription)
                 }
             }
         }

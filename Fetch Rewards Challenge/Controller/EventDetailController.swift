@@ -164,7 +164,7 @@ extension EventDetailController: EventFavoritedProtocol {
                         self?.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
                     }
                 case .failure(let error):
-                    print(error)
+                    print(error.localizedDescription)
                 }
             }
         } else {
@@ -176,7 +176,7 @@ extension EventDetailController: EventFavoritedProtocol {
                         self?.favoriteButton.setImage(viewModel.favoriteButtonImageDetailController, for: .normal)
                     }
                 case .failure(let error):
-                    print(error)
+                    print(error.localizedDescription)
                 }
             }
         }
