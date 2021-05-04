@@ -11,10 +11,10 @@
 ## Getting Started
 
 ```bash
-$ git clone https://github.com/stantraub/FetchRewardsChallenge.git
-$ cd FetchRewardsChallenge
+$ git clone https://github.com/stantraub/Eventer.git
+$ cd Eventer
 $ pod install
-$ open Fetch\ Rewards\ Challenge.xcworkspace/
+$ open Eventer.xcworkspace/
 ```
 
 ## Technologies Used
