@@ -1,4 +1,4 @@
-# Fetch Rewards Challenge
+# Eventer
 ![Swift version](https://img.shields.io/badge/swift-5.0-orange.svg)
 ![Platforms](https://img.shields.io/badge/platforms-iOS%20-lightgrey.svg)
 
