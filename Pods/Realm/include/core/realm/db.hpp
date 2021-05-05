@@ -33,6 +33,7 @@
 #include <realm/replication.hpp>
 #include <realm/version_id.hpp>
 #include <realm/db_options.hpp>
+#include <realm/util/logger.hpp>
 
 namespace realm {
 
@@ -213,6 +214,7 @@ public:
 
     /// Returns the version of the latest snapshot.
     version_type get_version_of_latest_snapshot();
+    VersionID get_version_id_of_latest_snapshot();
 
     /// Thrown by start_read() if the specified version does not correspond to a
     /// bound (AKA tethered) snapshot.
@@ -564,7 +566,7 @@ public:
     void end_read();
 
     // Live transactions state changes, often taking an observer functor:
-    DB::version_type commit_and_continue_as_read();
+    VersionID commit_and_continue_as_read();
     template <class O>
     void rollback_and_continue_as_read(O* observer);
     void rollback_and_continue_as_read()
@@ -594,12 +596,15 @@ public:
     _impl::History* get_history() const;
 
     // direct handover of accessor instances
-    Obj import_copy_of(const ConstObj& original); // slicing is OK for Obj/ConstObj
+    Obj import_copy_of(const Obj& original);
     TableRef import_copy_of(const ConstTableRef original);
-    LnkLst import_copy_of(const ConstLnkLst& original);
+    LnkLst import_copy_of(const LnkLst& original);
+    LnkSet import_copy_of(const LnkSet& original);
     LstBasePtr import_copy_of(const LstBase& original);
+    SetBasePtr import_copy_of(const SetBase& original);
+    CollectionBasePtr import_copy_of(const CollectionBase& original);
     LnkLstPtr import_copy_of(const LnkLstPtr& original);
-    LnkLstPtr import_copy_of(const ConstLnkLstPtr& original);
+    LnkSetPtr import_copy_of(const LnkSetPtr& original);
 
     // handover of the heavier Query and TableView
     std::unique_ptr<Query> import_copy_of(Query&, PayloadPolicy);
@@ -876,6 +881,7 @@ inline bool Transaction::promote_to_write(O* observer, bool nonblocking)
 
         REALM_ASSERT(repl); // Presence of `repl` follows from the presence of `hist`
         DB::version_type current_version = m_read_lock.m_version;
+        m_alloc.init_mapping_management(current_version);
         repl->initiate_transact(*this, current_version, history_updated); // Throws
 
         // If the group has no top array (top_ref == 0), create a new node
@@ -926,7 +932,9 @@ inline void Transaction::rollback_and_continue_as_read(O* observer)
     ref_type top_ref = m_read_lock.m_top_ref;
     size_t file_size = m_read_lock.m_file_size;
     _impl::ReversedNoCopyInputStream reversed_in(reverser);
-    advance_transact(top_ref, file_size, reversed_in, false); // Throws
+    m_alloc.update_reader_view(file_size); // Throws
+    update_allocator_wrappers(false);
+    advance_transact(top_ref, reversed_in, false); // Throws
 
     db->do_end_write();
 
@@ -950,29 +958,24 @@ inline bool Transaction::internal_advance_read(O* observer, VersionID version_id
         return false;
     }
 
+    DB::version_type old_version = m_read_lock.m_version;
     DB::ReadLockGuard g(*db, new_read_lock);
-    {
-        DB::version_type new_version = new_read_lock.m_version;
-        size_t new_file_size = new_read_lock.m_file_size;
-        ref_type new_top_ref = new_read_lock.m_top_ref;
+    DB::version_type new_version = new_read_lock.m_version;
+    size_t new_file_size = new_read_lock.m_file_size;
+    ref_type new_top_ref = new_read_lock.m_top_ref;
 
-        // Synchronize readers view of the file
-        SlabAlloc& alloc = m_alloc;
-        alloc.update_reader_view(new_file_size);
-        update_allocator_wrappers(writable);
-        using gf = _impl::GroupFriend;
-        // remap(new_file_size); // Throws
-        ref_type hist_ref = gf::get_history_ref(alloc, new_top_ref);
-
-        hist.update_from_ref_and_version(hist_ref, new_version);
-    }
+    // Synchronize readers view of the file
+    SlabAlloc& alloc = m_alloc;
+    alloc.update_reader_view(new_file_size);
+    update_allocator_wrappers(writable);
+    using gf = _impl::GroupFriend;
+    ref_type hist_ref = gf::get_history_ref(alloc, new_top_ref);
+    hist.update_from_ref_and_version(hist_ref, new_version);
 
     if (observer) {
         // This has to happen in the context of the originally bound snapshot
         // and while the read transaction is still in a fully functional state.
         _impl::TransactLogParser parser;
-        DB::version_type old_version = m_read_lock.m_version;
-        DB::version_type new_version = new_read_lock.m_version;
         _impl::ChangesetInputStream in(hist, old_version, new_version);
         parser.parse(in, *observer); // Throws
         observer->parse_complete();  // Throws
@@ -987,15 +990,8 @@ inline bool Transaction::internal_advance_read(O* observer, VersionID version_id
     // that the history was always implemented as a versioned entity, that was
     // part of the Realm state, then it would not have been necessary to retain
     // the old read lock beyond this point.
-
-    {
-        DB::version_type old_version = m_read_lock.m_version;
-        DB::version_type new_version = new_read_lock.m_version;
-        ref_type new_top_ref = new_read_lock.m_top_ref;
-        size_t new_file_size = new_read_lock.m_file_size;
-        _impl::ChangesetInputStream in(hist, old_version, new_version);
-        advance_transact(new_top_ref, new_file_size, in, writable); // Throws
-    }
+    _impl::ChangesetInputStream in(hist, old_version, new_version);
+    advance_transact(new_top_ref, in, writable); // Throws
     g.release();
     db->release_read_lock(m_read_lock);
     m_read_lock = new_read_lock;

@@ -24,13 +24,10 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import <realm/object-store/sync/generic_network_transport.hpp>
 #import <realm/util/scope_exit.hpp>
 
-#import "sync/generic_network_transport.hpp"
-
 using namespace realm;
-
-typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
 static_assert((int)RLMHTTPMethodGET        == (int)app::HttpMethod::get);
 static_assert((int)RLMHTTPMethodPOST       == (int)app::HttpMethod::post);
@@ -159,7 +156,8 @@ didCompleteWithError:(NSError *)error
     response.httpStatusCode = httpResponse.statusCode;
 
     if (error) {
-        response.body = [error localizedDescription];
+        response.body = error.localizedDescription;
+        response.customStatusCode = error.code;
         return _completionBlock(response);
     }
 

@@ -36,6 +36,19 @@ public:
     const char* message() const noexcept override;
 };
 
+class InvalidTableRef : public ExceptionWithBacktrace<std::exception> {
+public:
+    InvalidTableRef(const char* cause)
+        : m_message(cause)
+    {
+    }
+    const char* message() const noexcept override
+    {
+        return m_message.c_str();
+    }
+    std::string m_message;
+};
+
 
 /// Thrown by various functions to indicate that a specified table name is
 /// already in use.
@@ -303,8 +316,8 @@ public:
         /// You can not add index on a subtable of a subtable
         subtable_of_subtable_index,
 
-        /// You try to instantiate a list object not matching column type
-        list_type_mismatch
+        /// You try to instantiate a collection object not matching column type
+        collection_type_mismatch
     };
 
     LogicError(ErrorKind message);

@@ -31,21 +31,10 @@
 #include <realm/util/backtrace.hpp>
 
 // Linux epoll
-//
-// Require Linux kernel version >= 2.6.27 such that we have epoll_create1(),
-// `O_CLOEXEC`, and `EPOLLRDHUP`.
-#if defined(__linux__) && !REALM_ANDROID
-#include <linux/version.h>
-#if !defined(REALM_HAVE_EPOLL)
-#if !defined(REALM_DISABLE_UTIL_NETWORK_EPOLL)
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)
-#define REALM_HAVE_EPOLL 1
-#endif
-#endif
-#endif
-#endif
-#if !defined(REALM_HAVE_EPOLL)
-#define REALM_HAVE_EPOLL 0
+#if defined(REALM_USE_EPOLL) && !REALM_ANDROID
+#define REALM_NETWORK_USE_EPOLL 1
+#else
+#define REALM_NETWORK_USE_EPOLL 0
 #endif
 
 // FreeBSD Kqueue.
@@ -508,7 +497,7 @@ private:
     native_handle_type m_fd = -1;
     bool m_in_blocking_mode; // Not in nonblocking mode
 
-#if REALM_HAVE_EPOLL || REALM_HAVE_KQUEUE
+#if REALM_NETWORK_USE_EPOLL || REALM_HAVE_KQUEUE
     bool m_read_ready;
     bool m_write_ready;
     bool m_imminent_end_of_input; // Kernel has seen the end of input
@@ -1258,10 +1247,10 @@ public:
     /// will have become connected to the remote socket. It must be in the
     /// closed state (Socket::is_open()) when async_accept() is called.
     ///
-    /// \param ep Upon completion, the remote peer endpoint will have been
-    /// assigned to this variable.
     template <class H>
     void async_accept(Socket& sock, H handler);
+    /// \param ep Upon completion, the remote peer endpoint will have been
+    /// assigned to this variable.
     template <class H>
     void async_accept(Socket& sock, Endpoint& ep, H handler);
     /// @}
@@ -1794,7 +1783,7 @@ inline Service::OperQueue<Oper>::OperQueue(OperQueue&& q) noexcept
 }
 
 template <class Oper>
-inline Service::OperQueue<Oper>::~OperQueue() noexcept
+inline Service::OperQueue<Oper>::~OperQueue<Oper>() noexcept
 {
     clear();
 }
@@ -1817,7 +1806,7 @@ inline void Service::Descriptor::assign(native_handle_type fd, bool in_blocking_
     REALM_ASSERT(!is_open());
     m_fd = fd;
     m_in_blocking_mode = in_blocking_mode;
-#if REALM_HAVE_EPOLL || REALM_HAVE_KQUEUE
+#if REALM_NETWORK_USE_EPOLL || REALM_HAVE_KQUEUE
     m_read_ready = false;
     m_write_ready = false;
     m_imminent_end_of_input = false;
@@ -1828,7 +1817,7 @@ inline void Service::Descriptor::assign(native_handle_type fd, bool in_blocking_
 inline void Service::Descriptor::close() noexcept
 {
     REALM_ASSERT(is_open());
-#if REALM_HAVE_EPOLL || REALM_HAVE_KQUEUE
+#if REALM_NETWORK_USE_EPOLL || REALM_HAVE_KQUEUE
     if (m_is_registered)
         deregister_for_async();
     m_is_registered = false;
@@ -1839,7 +1828,7 @@ inline void Service::Descriptor::close() noexcept
 inline auto Service::Descriptor::release() noexcept -> native_handle_type
 {
     REALM_ASSERT(is_open());
-#if REALM_HAVE_EPOLL || REALM_HAVE_KQUEUE
+#if REALM_NETWORK_USE_EPOLL || REALM_HAVE_KQUEUE
     if (m_is_registered)
         deregister_for_async();
     m_is_registered = false;
@@ -1893,7 +1882,7 @@ inline void Service::Descriptor::ensure_nonblocking_mode()
 
 inline bool Service::Descriptor::assume_read_would_block() const noexcept
 {
-#if REALM_HAVE_EPOLL || REALM_HAVE_KQUEUE
+#if REALM_NETWORK_USE_EPOLL || REALM_HAVE_KQUEUE
     return !m_in_blocking_mode && !m_read_ready;
 #else
     return false;
@@ -1902,7 +1891,7 @@ inline bool Service::Descriptor::assume_read_would_block() const noexcept
 
 inline bool Service::Descriptor::assume_write_would_block() const noexcept
 {
-#if REALM_HAVE_EPOLL || REALM_HAVE_KQUEUE
+#if REALM_NETWORK_USE_EPOLL || REALM_HAVE_KQUEUE
     return !m_in_blocking_mode && !m_write_ready;
 #else
     return false;
@@ -1911,7 +1900,7 @@ inline bool Service::Descriptor::assume_write_would_block() const noexcept
 
 inline void Service::Descriptor::set_read_ready(bool value) noexcept
 {
-#if REALM_HAVE_EPOLL || REALM_HAVE_KQUEUE
+#if REALM_NETWORK_USE_EPOLL || REALM_HAVE_KQUEUE
     m_read_ready = value;
 #else
     // No-op
@@ -1921,7 +1910,7 @@ inline void Service::Descriptor::set_read_ready(bool value) noexcept
 
 inline void Service::Descriptor::set_write_ready(bool value) noexcept
 {
-#if REALM_HAVE_EPOLL || REALM_HAVE_KQUEUE
+#if REALM_NETWORK_USE_EPOLL || REALM_HAVE_KQUEUE
     m_write_ready = value;
 #else
     // No-op

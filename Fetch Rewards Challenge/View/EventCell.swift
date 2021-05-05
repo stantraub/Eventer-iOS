@@ -20,7 +20,7 @@ class EventCell: UITableViewCell {
     
     weak var delegate: EventFavoritedProtocol?
     
-    var viewModel: EventViewModel? {
+    var viewModel: EventDetailViewModel? {
         didSet { configure() }
     }
     

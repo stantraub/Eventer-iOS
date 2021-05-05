@@ -13,20 +13,23 @@ final class EventSearchController: UITableViewController {
     
     private let searchController = UISearchController(searchResultsController: nil)
     
-    private var events = [Event]()
     private var filteredEvents = [Event]()
     private var favoritedEventIds = Set<Int>()
     
     private var inSearchMode: Bool {
-        return searchController.isActive && !searchController.searchBar.text!.isEmpty
+        searchController.isActive && !searchController.searchBar.text!.isEmpty
     }
+    
+    weak var coordinator: EventCoordinator?
+    private var viewModel = EventSearchViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         configureSearchController()
+        bindViewModel()
         fetchAndPopulateFavoritedEvents()
-        fetchEvents()
+        viewModel.fetchEvents()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -35,32 +38,22 @@ final class EventSearchController: UITableViewController {
         favoritedEventIds.removeAll()
         fetchAndPopulateFavoritedEvents()
     }
-    
-    // MARK: - API
-    
-    private func fetchEvents() {
-        showLoader(true)
         
-        Service.fetchEvents { [weak self] result in
-            switch result {
-            case .success(let events):
-                self?.events = events
-                
-                DispatchQueue.main.async {
-                    self?.showLoader(false)
-                    self?.tableView.reloadData()
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self?.showLoader(false)
-                }
-                
+    // MARK: - Helpers
+    
+    private func bindViewModel() {
+        viewModel.eventsCompletion = { [weak self] error in
+            guard let strongSelf = self else { return }
+            
+            if let error = error {
                 print(error.localizedDescription)
+            } else {
+                DispatchQueue.main.async {
+                    strongSelf.tableView.reloadData()
+                }
             }
         }
     }
-        
-    // MARK: - Helpers
     
     private func configureUI() {
         if #available(iOS 13.0, *) {
@@ -110,16 +103,16 @@ final class EventSearchController: UITableViewController {
 
 extension EventSearchController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return inSearchMode ? filteredEvents.count : events.count
+        inSearchMode ? filteredEvents.count : viewModel.events.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var event = inSearchMode ? filteredEvents[indexPath.row] : events[indexPath.row]
+        var event = inSearchMode ? filteredEvents[indexPath.row] : viewModel.events[indexPath.row]
         if favoritedEventIds.contains(event.id) {
             event.favorited = true
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: EventCell.identifier, for: indexPath) as! EventCell
-        cell.viewModel = EventViewModel(event: event)
+        cell.viewModel = EventDetailViewModel(event: event)
         cell.delegate = self
         return cell
     }
@@ -129,13 +122,12 @@ extension EventSearchController {
 
 extension EventSearchController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        var event = inSearchMode ? filteredEvents[indexPath.row] : events[indexPath.row]
+        var event = inSearchMode ? filteredEvents[indexPath.row] : viewModel.events[indexPath.row]
         if favoritedEventIds.contains(event.id) {
             event.favorited = true
         }
-        let controller = EventDetailController()
-        controller.viewModel = EventViewModel(event: event)
-        navigationController?.pushViewController(controller, animated: true)
+        
+        coordinator?.presentEventDetail(event: event)
     }
 }
 
@@ -154,7 +146,7 @@ extension EventSearchController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let searchText = searchController.searchBar.text?.lowercased() else { return }
         
-        filteredEvents = events.filter { $0.title.lowercased().contains(searchText) }
+        filteredEvents = viewModel.events.filter { $0.title.lowercased().contains(searchText) }
 
         DispatchQueue.main.async { [weak self] in
             self?.tableView.reloadData()

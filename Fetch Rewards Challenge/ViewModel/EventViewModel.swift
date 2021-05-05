@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct EventViewModel {
+struct EventDetailViewModel {
     
     // MARK: - Properties
     

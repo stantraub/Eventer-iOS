@@ -11,7 +11,7 @@ final class EventDetailController: UIViewController {
     
     // MARK: - Properties
         
-    var viewModel: EventViewModel? {
+    var viewModel: EventDetailViewModel? {
         didSet { configureWithViewModel() }
     }
     

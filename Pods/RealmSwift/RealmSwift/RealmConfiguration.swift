@@ -184,7 +184,19 @@ extension Realm {
 
          - note: Setting this property to `true` doesn't disable file format migrations.
          */
-        public var deleteRealmIfMigrationNeeded: Bool = false
+        public var deleteRealmIfMigrationNeeded: Bool {
+            get {
+                return _deleteRealmIfMigrationNeeded
+            }
+            set(newValue) {
+                if newValue && syncConfiguration != nil {
+                    throwRealmException("Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
+                }
+                _deleteRealmIfMigrationNeeded = newValue
+            }
+        }
+
+        private var _deleteRealmIfMigrationNeeded: Bool = false
 
         /**
          A block called when opening a Realm for the first time during the
@@ -302,5 +314,18 @@ extension Realm.Configuration: CustomStringConvertible {
         return gsub(pattern: "\\ARLMRealmConfiguration",
                     template: "Realm.Configuration",
                     string: rlmConfiguration.description) ?? ""
+    }
+}
+
+// MARK: Equatable
+
+extension Realm.Configuration: Equatable {
+    public static func == (lhs: Realm.Configuration, rhs: Realm.Configuration) -> Bool {
+        lhs.encryptionKey == rhs.encryptionKey &&
+            lhs.fileURL == rhs.fileURL &&
+            lhs.syncConfiguration?.partitionValue == rhs.syncConfiguration?.partitionValue &&
+            lhs.inMemoryIdentifier == rhs.inMemoryIdentifier &&
+            lhs.readOnly == rhs.readOnly &&
+            lhs.schemaVersion == rhs.schemaVersion
     }
 }
