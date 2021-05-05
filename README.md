@@ -12,9 +12,9 @@
 
 ```bash
 $ git clone https://github.com/stantraub/Eventer.git
-$ cd Eventer
+$ cd Fetch\ Rewards\ Challenge
 $ pod install
-$ open Eventer.xcworkspace/
+$ open Fetch\ Rewards\ Challenge.xcworkspace
 ```
 
 ## Technologies Used
